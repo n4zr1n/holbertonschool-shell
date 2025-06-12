@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # This script groups visitors by IP and HTTP status code, and displays this data.
-if ! awk 'NF >= 9 { print $1, $9 }' apache-access.log > /dev/null 2>&1; then
-  echo "wrong format log file"
-  exit 1
+if ! awk 'NF >= 9 { exit 0 } END { exit 1 }' apache-access.log; then
+    echo "wrong format log file"
+    exit 0
 fi
 awk 'NF >= 9 { print $1, $9 }' apache-access.log | sort | uniq -c | sort -nr
 
