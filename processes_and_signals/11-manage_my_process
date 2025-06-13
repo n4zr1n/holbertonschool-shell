@@ -1,27 +1,30 @@
 #!/usr/bin/env bash
-# The script manages process
-PID_FILE="/var/run/my_process.pid"
-PROCESS_SCRIPT="./manage_my_process"
+# Script to manage the manage_my_process daemon
 case "$1" in
     start)
-    	./manage_my_process &
-   	 echo $! > /var/run/my_process.pid
-    	echo "manage_my_process started"
-	;;
+        ./manage_my_process &
+        pid=$!
+        echo "$pid" > /var/run/my_process.pid
+        echo "manage_my_process started"
+        ;;
     stop)
-	if [ -f "$PID_FILE" ]; then
-        	kill "$(cat "$PID_FILE")" 2>/dev/null
-        	rm -f "$PID_FILE"
-    	fi
-    	echo "manage_my_process stopped"
+        if [ -f /var/run/my_process.pid ]; then
+            pid=$(cat /var/run/my_process.pid)
+            if kill "$pid" 2>/dev/null; then
+                rm -f /var/run/my_process.pid
+                echo "manage_my_process stopped"
+            else
+                echo "Process not running but removing stale PID file"
+                rm -f /var/run/my_process.pid
+                echo "manage_my_process stopped"
+            fi
+        else
+            echo "manage_my_process stopped"
+        fi
         ;;
     restart)
-        if [ -f "$PID_FILE" ]; then
-            kill "$(cat "$PID_FILE")" 2>/dev/null
-            rm -f "$PID_FILE"
-        fi
-        nohup "$PROCESS_SCRIPT" > /dev/null 2>&1 &
-        echo $! > "$PID_FILE"
+        "$0" stop
+        "$0" start
         echo "manage_my_process restarted"
         ;;
     *)
