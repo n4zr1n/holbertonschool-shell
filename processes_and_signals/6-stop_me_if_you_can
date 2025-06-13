@@ -1,11 +1,5 @@
 #!/usr/bin/env bash
 # The script stops 4-to_infinity_and_beyond process.
-pid=$(pgrep -f "4-to_infinity_and_beyond")
-
-if [ -n "$pid" ]; then
-  echo "Stopping 4-to_infinity_and_beyond (PID: $pid)..."
-  pkill -f "4-to_infinity_and_beyond"
-else
-  echo "Process not found."
-fi
+pid=$(ps -eo pid,cmd | grep "[4]-to_infinity_and_beyond" | awk '{print $1}')
+[ -n "$pid" ] && xargs -r -n1 < <(echo "$pid") /bin/kill
 
