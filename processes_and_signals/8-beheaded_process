@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # The script kills the process 7-highlander.
-pids=$(ps -eo pid,comm | awk '$2 == "7-highlander" { print $1 }')
+pids=$(ps -eo pid,args | grep '[7]-highlander' | awk '{print $1}')
 for pid in $pids; do
   kill -9 "$pid" > /dev/null 2>&1
 done
