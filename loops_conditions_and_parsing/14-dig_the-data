@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 # This script groups visitors by IP and HTTP status code, and displays this data.
-awk '{print $1, $9}' access.log | awk '{count[$1, $2]++} END {
-  for (key in count) {
-    split(key, parts, SUBSEP);
-    print count[key], parts[1], parts[2]
-  }
-}' | sort -nr
+awk '
+NF >= 9 && $1 ~ /^[0-9.]+$/ && $9 ~ /^[0-9]{3}$/ {
+  key = $1 " " $9
+  count[key]++
+}
+END {
+  for (k in count)
+    print count[k], k
+}
+' access.log | sort -nr
 
