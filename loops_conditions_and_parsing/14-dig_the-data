@@ -2,12 +2,15 @@
 # This script groups visitors by IP and HTTP status code, and displays this data.
 awk '
 NF >= 9 && $1 ~ /^[0-9.]+$/ && $9 ~ /^[0-9]{3}$/ {
-  key = $1 " " $9
-  count[key]++
+  count[$1, $9]++
 }
 END {
-  for (k in count)
-    print count[k], k
+  for (key in count) {
+    n = split(key, parts, SUBSEP)
+    if (n == 2) {
+      print count[key], parts[1], parts[2]
+    }
+  }
 }
 ' access.log | sort -nr
 
